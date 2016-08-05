@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">GankMVP</string>
+    <string name="error_retry">Error. Tap to retry.</string>
+    <string name="empty_posts">Empty</string>
+</resources>
