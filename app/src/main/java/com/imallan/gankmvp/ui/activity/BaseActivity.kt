@@ -2,6 +2,7 @@ package com.imallan.gankmvp.ui.activity
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import com.imallan.gankmvp.PresenterManager
 
 open class BaseActivity : AppCompatActivity() {
 
@@ -31,6 +32,11 @@ open class BaseActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(STATE_PRESENTER_KEY, getPresenterKey())
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (isFinishing) PresenterManager.remove(getPresenterKey())
     }
 
 }

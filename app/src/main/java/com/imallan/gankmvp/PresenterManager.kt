@@ -23,4 +23,8 @@ object PresenterManager {
         return t
     }
 
+    fun remove(key: String) {
+        map.remove(key)
+    }
+
 }
