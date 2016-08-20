@@ -10,33 +10,29 @@ open class BaseActivity : AppCompatActivity() {
         const val STATE_PRESENTER_KEY = "STATE_PRESENTER_KEY"
     }
 
-    lateinit private var mUniquePresenterKey: String
+    lateinit var componentKey: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mUniquePresenterKey = if (savedInstanceState != null) {
-            savedInstanceState.getString(STATE_PRESENTER_KEY) ?: createUniquePresenterKey()
+        componentKey = if (savedInstanceState != null) {
+            savedInstanceState.getString(STATE_PRESENTER_KEY) ?: createUniqueComponentKey()
         } else {
-            createUniquePresenterKey()
+            createUniqueComponentKey()
         }
     }
 
-    protected fun getPresenterKey(): String {
-        return mUniquePresenterKey
-    }
-
-    private fun createUniquePresenterKey(): String {
+    private fun createUniqueComponentKey(): String {
         return "${javaClass.simpleName}${System.currentTimeMillis()}"
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(STATE_PRESENTER_KEY, getPresenterKey())
+        outState.putString(STATE_PRESENTER_KEY, componentKey)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (isFinishing) PresenterManager.remove(getPresenterKey())
+        if (isFinishing) PresenterManager.remove(componentKey)
     }
 
 }

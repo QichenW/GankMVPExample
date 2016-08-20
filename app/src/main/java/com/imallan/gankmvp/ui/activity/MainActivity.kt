@@ -4,17 +4,15 @@ import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import com.imallan.gankmvp.PresenterManager
+import com.imallan.gankmvp.GankMVPApplication
 import com.imallan.gankmvp.R
-import com.imallan.gankmvp.model.post.PostDatabaseSource
-import com.imallan.gankmvp.model.post.PostMemorySource
-import com.imallan.gankmvp.model.post.PostRemoteSource
-import com.imallan.gankmvp.model.post.PostRepository
+import com.imallan.gankmvp.di.module.MainActivityModule
 import com.imallan.gankmvp.presenter.post.PostPresenter
 import com.imallan.gankmvp.presenter.post.PostView
 import com.imallan.gankmvp.ui.adapter.PostsAdapter
 import com.imallan.playground.Post
 import com.imallan.toothpick.bind
+import javax.inject.Inject
 
 class MainActivity : BaseActivity(), PostView {
 
@@ -23,7 +21,8 @@ class MainActivity : BaseActivity(), PostView {
     val mProgressView: View by bind(R.id.progress_loading)
     private val mAdapter = PostsAdapter()
 
-    lateinit private var mPresenter: PostPresenter
+    @Inject
+    lateinit var mPresenter: PostPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,18 +37,11 @@ class MainActivity : BaseActivity(), PostView {
             setHasFixedSize(true)
         }
 
-        mPresenter = PresenterManager.get(getPresenterKey(), {
-            //TODO: use dagger injection here
-            PostPresenter(
-                    postRepository = PostRepository(
-                            PostRemoteSource(),
-                            PostDatabaseSource(),
-                            PostMemorySource()
-                    ))
-        })
+        GankMVPApplication.getComponent(componentKey, {
+            plus(MainActivityModule())
+        }).inject(this)
 
         mPresenter.bind(this)
-
 
         mPresenter.loadPosts()
 
@@ -60,6 +52,9 @@ class MainActivity : BaseActivity(), PostView {
     override fun onDestroy() {
         super.onDestroy()
         mPresenter.unbind(isFinishing)
+        if (isFinishing) {
+            GankMVPApplication.removeComponent(componentKey)
+        }
     }
 
     override fun showLoading(loading: Boolean) {
