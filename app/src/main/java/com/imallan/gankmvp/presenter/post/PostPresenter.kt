@@ -4,10 +4,12 @@ import com.imallan.gankmvp.extensions.loge
 import com.imallan.gankmvp.extensions.pending
 import com.imallan.gankmvp.model.post.PostRepository
 import com.imallan.playground.Post
-import rx.android.schedulers.AndroidSchedulers
+import rx.Scheduler
+import rx.Subscription
 import rx.subscriptions.CompositeSubscription
 
-class PostPresenter(private val postRepository: PostRepository) {
+class PostPresenter(private val mainScheduler: Scheduler,
+                    private val postRepository: PostRepository) {
 
     private var view: PostView? = null
     private var mData: List<Post>? = null
@@ -25,10 +27,14 @@ class PostPresenter(private val postRepository: PostRepository) {
         if (isFinishing) mPendingSubscriptions.clear()
     }
 
+    private var loadPostsSubscription: Subscription? = null
 
     fun loadPosts() {
-        postRepository.getAllPosts()
-                .observeOn(AndroidSchedulers.mainThread())
+        if (loadPostsSubscription != null) {
+            return
+        }
+        loadPostsSubscription = postRepository.getAllPosts()
+                .observeOn(mainScheduler)
                 .subscribe({
                     this.mData = it
                     view?.apply {
@@ -44,7 +50,7 @@ class PostPresenter(private val postRepository: PostRepository) {
     fun requestPosts(type: String = "福利", page: Int = 1, limit: Int = 20) {
         view?.showLoading(true)
         postRepository.requestPosts(type, page, limit)
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(mainScheduler)
                 .subscribe({
                     view?.showLoading(false)
                 }, {

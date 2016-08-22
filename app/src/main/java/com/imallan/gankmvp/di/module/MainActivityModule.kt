@@ -9,14 +9,17 @@ import com.imallan.gankmvp.model.post.PostRepository
 import com.imallan.gankmvp.presenter.post.PostPresenter
 import dagger.Module
 import dagger.Provides
+import rx.Scheduler
+import javax.inject.Named
 
 @Module
 class MainActivityModule {
 
     @Provides
     @MainActivityScope
-    fun providesPostPresenter(postRepository: PostRepository): PostPresenter {
-        return PostPresenter(postRepository)
+    fun providesPostPresenter(@Named("main") scheduler: Scheduler,
+                              postRepository: PostRepository): PostPresenter {
+        return PostPresenter(scheduler, postRepository)
     }
 
     @Provides
@@ -35,8 +38,8 @@ class MainActivityModule {
 
     @Provides
     @MainActivityScope
-    fun providesPosDatabaseSource(): PostDatabaseSource {
-        return PostDatabaseSource()
+    fun providesPosDatabaseSource(@Named("realm") scheduler: Scheduler): PostDatabaseSource {
+        return PostDatabaseSource(scheduler)
     }
 
     @Provides

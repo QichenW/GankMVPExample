@@ -8,11 +8,7 @@ class PostRepository(private val remoteSource: PostRemoteSource,
                      private val memorySource: PostMemorySource) {
 
     fun getAllPosts(): Observable<List<Post>> {
-        return Observable.concat(
-                memorySource.getAllPosts(),
-                databaseSource.getAllPosts()
-                        .doOnNext { memorySource.cache(it) }
-        )
+        return databaseSource.getAllPosts()
     }
 
     fun requestPosts(type: String, page: Int, limit: Int): Observable<List<Post>> {

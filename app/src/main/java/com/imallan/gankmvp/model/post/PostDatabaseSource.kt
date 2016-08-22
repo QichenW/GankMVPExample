@@ -4,20 +4,28 @@ import com.imallan.gankmvp.extensions.inTransaction
 import com.imallan.playground.Post
 import io.realm.Realm
 import rx.Observable
+import rx.Scheduler
 import rx.android.schedulers.AndroidSchedulers
 
-class PostDatabaseSource {
+class PostDatabaseSource(val realmScheduler: Scheduler) {
 
     fun getAllPosts(): Observable<List<Post>> {
-        return Realm.getDefaultInstance().run {
-            where(Post::class.java).findAllAsync()
-                    .asObservable()
-                    .filter { it.isLoaded }
-                    .map { copyFromRealm(it) }
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .onBackpressureDrop()
-                    .doOnUnsubscribe { close() }
+        var realm: Realm? = null
+        return Observable.fromCallable {
+            realm = Realm.getDefaultInstance()
+            realm!!
         }
+                .subscribeOn(realmScheduler)
+                .flatMap {
+                    it.where(Post::class.java).findAllAsync().asObservable()
+                }
+                .filter { it.isLoaded }
+                .map { realm!!.copyFromRealm(it) }
+                .doOnUnsubscribe {
+                    realm?.close()
+                }
+                .unsubscribeOn(realmScheduler)
+                .observeOn(AndroidSchedulers.mainThread())
     }
 
     fun save(posts: List<Post>) {

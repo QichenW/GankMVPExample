@@ -6,6 +6,7 @@ import com.imallan.gankmvp.di.component.ApplicationComponent
 import com.imallan.gankmvp.di.component.DaggerApplicationComponent
 import com.imallan.gankmvp.di.module.ApiModule
 import com.imallan.gankmvp.di.module.ApplicationModule
+import com.imallan.gankmvp.di.module.RxModule
 import com.imallan.gankmvp.extensions.logd
 import com.uphyca.stetho_realm.RealmInspectorModulesProvider
 import io.realm.Realm
@@ -40,6 +41,7 @@ class GankMVPApplication : Application() {
 
         applicationComponent = DaggerApplicationComponent.builder()
                 .applicationModule(ApplicationModule(this))
+                .rxModule(RxModule())
                 .apiModule(ApiModule(BuildConfig.DEBUG))
                 .build()
 
