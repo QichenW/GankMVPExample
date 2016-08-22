@@ -6,6 +6,7 @@ import dagger.Provides
 import rx.Scheduler
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import java.util.concurrent.Executors
 import javax.inject.Named
 
 @Module
@@ -26,19 +27,16 @@ class RxModule {
     @Provides
     @Named("realm")
     fun providesRealmScheduler(): Scheduler {
-        var looper: Looper? = null
-        var block = true
-        val thread: Thread = Thread({
-            Looper.prepare()
-            looper = Looper.myLooper()
-            block = false
-            Looper.loop()
-        })
-        thread.start()
-        while (block) {
-            //
+        Executors.newSingleThreadExecutor().run {
+            val myLooper: Looper = submit<Looper> {
+                Looper.prepare()
+                return@submit Looper.myLooper()
+            }.get()
+            execute {
+                Looper.loop()
+            }
+            return AndroidSchedulers.from(myLooper)
         }
-        return AndroidSchedulers.from(looper!!)
     }
 
 }
