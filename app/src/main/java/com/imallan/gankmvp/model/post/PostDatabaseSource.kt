@@ -3,6 +3,7 @@ package com.imallan.gankmvp.model.post
 import com.imallan.gankmvp.extensions.inTransaction
 import com.imallan.playground.Post
 import io.realm.Realm
+import io.realm.Sort
 import rx.Observable
 import rx.Scheduler
 import rx.android.schedulers.AndroidSchedulers
@@ -17,7 +18,9 @@ class PostDatabaseSource(val realmScheduler: Scheduler) {
         }
                 .subscribeOn(realmScheduler)
                 .flatMap {
-                    it.where(Post::class.java).findAllAsync().asObservable()
+                    it.where(Post::class.java)
+                            .findAllSortedAsync("publishedAt", Sort.DESCENDING)
+                            .asObservable()
                 }
                 .filter { it.isLoaded }
                 .map { realm!!.copyFromRealm(it) }

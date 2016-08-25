@@ -1,29 +1,36 @@
 package com.imallan.gankmvp.ui.fragment
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.imallan.gankmvp.GankMVPApplication
 import com.imallan.gankmvp.R
+import com.imallan.gankmvp.di.module.PostsModule
 import com.imallan.gankmvp.presenter.post.PostPresenter
 import com.imallan.gankmvp.presenter.post.PostView
 import com.imallan.gankmvp.ui.adapter.PostsAdapter
 import com.imallan.playground.Post
+import javax.inject.Inject
 
-class PostsFragment : Fragment(), PostView {
+class PostsFragment : BaseFragment(), PostView {
 
     private lateinit var mErrorView: View
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mProgressView: View
     private val mAdapter = PostsAdapter()
+    @Inject
     lateinit var presenter: PostPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         retainInstance = true
+
+        GankMVPApplication.getComponent(componentKey, {
+            plus(PostsModule())
+        }).inject(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater,
@@ -86,7 +93,10 @@ class PostsFragment : Fragment(), PostView {
     }
 
     override fun onDestroy() {
-        presenter.unbind(true)
+        if (activity.isFinishing) {
+            presenter.unbind(true)
+            GankMVPApplication.removeComponent(componentKey)
+        }
         super.onDestroy()
     }
 

@@ -6,7 +6,7 @@ import android.content.SharedPreferences
 import com.imallan.gankmvp.api.GankService
 import com.imallan.gankmvp.di.module.ApiModule
 import com.imallan.gankmvp.di.module.ApplicationModule
-import com.imallan.gankmvp.di.module.MainActivityModule
+import com.imallan.gankmvp.di.module.PostsModule
 import com.imallan.gankmvp.di.module.RxModule
 import dagger.Component
 import javax.inject.Singleton
@@ -23,5 +23,7 @@ interface ApplicationComponent {
 
     fun getApiService(): GankService
 
-    fun plus(mainActivityModule: MainActivityModule): MainActivityComponent
+//    fun plus(postsModule: PostsModule): MainActivityComponent
+
+    fun plus(postsModule: PostsModule): PostsFragmentComponent
 }

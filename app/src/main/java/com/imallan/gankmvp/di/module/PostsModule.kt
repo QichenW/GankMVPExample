@@ -1,7 +1,7 @@
 package com.imallan.gankmvp.di.module
 
 import com.imallan.gankmvp.api.GankService
-import com.imallan.gankmvp.di.scope.MainActivityScope
+import com.imallan.gankmvp.di.scope.PostsScope
 import com.imallan.gankmvp.model.post.PostDatabaseSource
 import com.imallan.gankmvp.model.post.PostMemorySource
 import com.imallan.gankmvp.model.post.PostRemoteSource
@@ -13,17 +13,17 @@ import rx.Scheduler
 import javax.inject.Named
 
 @Module
-class MainActivityModule {
+class PostsModule {
 
     @Provides
-    @MainActivityScope
+    @PostsScope
     fun providesPostPresenter(@Named("main") scheduler: Scheduler,
                               postRepository: PostRepository): PostPresenter {
         return PostPresenter(scheduler, postRepository)
     }
 
     @Provides
-    @MainActivityScope
+    @PostsScope
     fun providesPostRepository(remoteSource: PostRemoteSource,
                                databaseSource: PostDatabaseSource,
                                memorySource: PostMemorySource): PostRepository {
@@ -31,19 +31,19 @@ class MainActivityModule {
     }
 
     @Provides
-    @MainActivityScope
+    @PostsScope
     fun providesPostRemoteSource(gankService: GankService): PostRemoteSource {
         return PostRemoteSource(gankService)
     }
 
     @Provides
-    @MainActivityScope
+    @PostsScope
     fun providesPosDatabaseSource(@Named("realm") scheduler: Scheduler): PostDatabaseSource {
         return PostDatabaseSource(scheduler)
     }
 
     @Provides
-    @MainActivityScope
+    @PostsScope
     fun providesPostMemorySource(): PostMemorySource {
         return PostMemorySource()
     }

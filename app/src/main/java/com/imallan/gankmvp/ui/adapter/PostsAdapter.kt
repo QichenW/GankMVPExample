@@ -1,5 +1,6 @@
 package com.imallan.gankmvp.ui.adapter
 
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -33,8 +34,27 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
     override fun getItemCount(): Int = mData.size
 
     fun setData(data: List<Post>) {
+        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return mData[oldItemPosition]._id == data[newItemPosition]._id
+            }
+
+            override fun getOldListSize(): Int {
+                return mData.size
+            }
+
+            override fun getNewListSize(): Int {
+                return data.size
+            }
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return mData[oldItemPosition].url == data[newItemPosition].url
+            }
+
+        })
         mData = data
-        notifyDataSetChanged()
+        diffResult.dispatchUpdatesTo(this)
     }
 
     class ViewHolder : RecyclerView.ViewHolder {
